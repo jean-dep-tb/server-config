@@ -1,0 +1,126 @@
+version: '3.7'
+services:
+  ms-config:
+    image: ms-config:v1
+    ports:
+      - "8888:8888"
+    restart: always
+    networks:
+      - springcloud
+  ms-eureka:
+    image: ms-eureka:v1
+    ports:
+      - "8761:8761"
+    restart: always
+    networks:
+      - springcloud
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    restart: always
+    networks:
+      - springcloud
+  ms-cliente:
+    image: ms-cliente:v1
+    ports:
+      - "8020:8020"
+    restart: always
+    networks:
+      - springcloud
+    depends_on: 
+      - ms-config
+      - ms-eureka
+      - mongo
+  ms-cuenta-banco:
+    image: ms-cuenta-banco:v1
+    ports:
+      - "8021:8021"
+    restart: always
+    networks:
+      - springcloud
+    depends_on: 
+      - ms-config
+      - ms-eureka
+      - mongo
+      - ms-cliente
+  ms-cuenta-credito:
+    image: ms-cuenta-credito:v1
+    ports:
+      - "8022:8022"
+    restart: always
+    networks:
+      - springcloud
+    depends_on: 
+      - ms-config
+      - ms-eureka
+      - mongo
+      - ms-cliente
+  ms-op-banco:
+    image: ms-op-banco:v1
+    ports:
+      - "8023:8023"
+    restart: always
+    networks:
+      - springcloud
+    depends_on: 
+      - ms-config
+      - ms-eureka
+      - mongo
+      - ms-cuenta-banco
+      - ms-cuenta-credito
+  ms-op-credito:
+    image: ms-op-credito:v1
+    ports:
+      - "8024:8024"
+    restart: always
+    networks:
+      - springcloud
+    depends_on:
+      - ms-config
+      - ms-eureka
+      - mongo
+      - ms-cuenta-credito
+  ms-bancos:
+    image: ms-bancos:v1
+    ports:
+      - "8025:8025"
+    restart: always
+    networks:
+      - springcloud
+    depends_on:
+      - ms-config
+      - ms-eureka
+      - mongo
+  ms-atm:
+    image: ms-atm:v1
+    ports:
+      - "8026:8026"
+    restart: always
+    networks:
+      - springcloud
+    depends_on:
+      - ms-config
+      - ms-eureka
+      - mongo
+      - ms-op-credito
+      - ms-op-banco
+  ms-zuul:
+    image: ms-zuul:v1
+    ports:
+        - "8090:8090"
+    restart: always
+    networks:
+        - springcloud
+    depends_on: 
+        - ms-config
+        - ms-eureka
+        - ms-cliente
+        - ms-cuenta-banco
+        - ms-cuenta-credito
+        - ms-op-banco
+        - ms-op-credito
+        - ms-bancos
+        - ms-atm
+networks:
+  springcloud:
